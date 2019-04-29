@@ -16,7 +16,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -37,6 +37,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -55,6 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="tvElement.cs" />
+    <Compile Include="ZoneInfoElement.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -72,11 +76,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -84,7 +83,7 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -93,6 +92,52 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\World_Time_Zones_Map.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\m01.png" />
+    <Resource Include="Images\m02.png" />
+    <Resource Include="Images\m03.png" />
+    <Resource Include="Images\m0330.png" />
+    <Resource Include="Images\m04.png" />
+    <Resource Include="Images\m05.png" />
+    <Resource Include="Images\m06.png" />
+    <Resource Include="Images\m07.png" />
+    <Resource Include="Images\m08.png" />
+    <Resource Include="Images\m09.png" />
+    <Resource Include="Images\m0930.png" />
+    <Resource Include="Images\m10.png" />
+    <Resource Include="Images\m11.png" />
+    <Resource Include="Images\m12.png" />
+    <Resource Include="Images\p00.png" />
+    <Resource Include="Images\p01.png" />
+    <Resource Include="Images\p02.png" />
+    <Resource Include="Images\p03.png" />
+    <Resource Include="Images\p0330.png" />
+    <Resource Include="Images\p04.png" />
+    <Resource Include="Images\p0430.png" />
+    <Resource Include="Images\p05.png" />
+    <Resource Include="Images\p0530.png" />
+    <Resource Include="Images\p0545.png" />
+    <Resource Include="Images\p06.png" />
+    <Resource Include="Images\p0630.png" />
+    <Resource Include="Images\p07.png" />
+    <Resource Include="Images\p08.png" />
+    <Resource Include="Images\p0845.png" />
+    <Resource Include="Images\p09.png" />
+    <Resource Include="Images\p0930.png" />
+    <Resource Include="Images\p10.png" />
+    <Resource Include="Images\p1030.png" />
+    <Resource Include="Images\p11.png" />
+    <Resource Include="Images\p12.png" />
+    <Resource Include="Images\p1245.png" />
+    <Resource Include="Images\p13.png" />
+    <Resource Include="Images\p14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\World_Time_Zones_Map.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

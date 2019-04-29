@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
+using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Global_Clock
 {
@@ -20,9 +26,378 @@ namespace Global_Clock
     /// </summary>
     public partial class MainWindow : Window
     {
+        //List<BitmapImage> lstImages = new List<BitmapImage>();
+        BitmapImage bmpImage = new BitmapImage(new Uri("pack://application:,,/Images/World_Time_Zones_Map.png")); 
+        List<tvElement> tvList = new List<tvElement>();
+        List<TreeViewItem> lstZIItems = new List<TreeViewItem>();
+        List<TreeViewItem> lstZIStandarItems = new List<TreeViewItem>();
+        List<ZoneInfoElement> lstZoneInfo = new List<ZoneInfoElement>();
+        //List<string> lstZoneInfoNames = new List<string>();
+        private delegate void UpdateTime(string name);
+        private delegate void UpdateTreeView();
+        private Thread threadUpdate;
+        private TimeZoneInfo currentTimeZone;
+        private bool calledByChild = false;
+        private string name = "Eastern Standard Time";
         public MainWindow()
         {
             InitializeComponent();
+            currentTimeZone = TimeZoneInfo.FindSystemTimeZoneById(name);
+
+            itializeTreeNodes();
+            threadUpdate = new Thread(update)
+            {
+                IsBackground = true
+
+            };
+            threadUpdate.Start();
+            //imgWorld.Source = 
+            //imgWorld.Source = bmpImage;
+            
+            //lstZoneInfoNames = lstZoneInfo.Select(t => t.name).ToList();
+            imgWorld.Source = bmpImage;
+        }
+
+        private void update()
+        {
+            try
+            {
+                while (true)
+                {
+                    txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
+                    Thread.Sleep(1000);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        private void setTxtHourText(string name)
+        {
+            DateTime previewDate = TimeZoneInfo.ConvertTime(DateTime.UtcNow, currentTimeZone);
+
+            txtHour.Inlines.Clear();
+            txtHour.Inlines.Add(coloredRun(name, Brushes.DarkSlateBlue));
+            txtHour.Inlines.Add(new Run(Environment.NewLine));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("dddd MMMM", CultureInfo.CreateSpecificCulture("en-us")), Brushes.OrangeRed));
+            txtHour.Inlines.Add(new Run(Environment.NewLine));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("dd"), Brushes.DarkSlateGray));
+            txtHour.Inlines.Add(coloredRun("/", Brushes.OrangeRed));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("MM"), Brushes.DarkSlateGray));
+            txtHour.Inlines.Add(coloredRun("/", Brushes.OrangeRed));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("yyyy"), Brushes.DarkSlateGray));
+            txtHour.Inlines.Add(new Run(Environment.NewLine));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("HH"), Brushes.DarkSlateGray));
+            txtHour.Inlines.Add(coloredRun(":", Brushes.OrangeRed));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("mm"), Brushes.DarkSlateGray));
+            txtHour.Inlines.Add(coloredRun(":", Brushes.OrangeRed));
+            txtHour.Inlines.Add(coloredRun(previewDate.ToString("ss"), Brushes.DarkSlateGray));
+            //txtHour.Inlines.Add(coloredRun(previewDate.ToString("HH:mm:ss"), Brushes.OrangeRed));
+            //txtHour.Text = currentTimeZone.DisplayName;
+            //txtHour.Text = previewDate.ToString("dddd MMMM", CultureInfo.CreateSpecificCulture("en-us")) + "  " + previewDate.ToString("dd/MM/yyyy") + Environment.NewLine;
+            //txtHour.Text += previewDate.ToString("HH:mm:ss");
+        }
+        
+
+        private int getTimeZoneIndex(TreeViewItem item)
+        {
+            int index = 0;
+            if (lstZoneInfo.Select(t => t.name).ToList().Contains(item.Header))
+            {
+                index = item.TabIndex;
+            }
+            return index;
+        }
+
+        private TreeViewItem getParent(TreeViewItem item)
+        {
+            TreeViewItem Parent;
+            if (item.Parent is TreeViewItem)
+            {
+               Parent = getParent(item.Parent as TreeViewItem);
+            }
+            else
+            {
+                return item;
+            }
+            return Parent;
+        }
+
+        private BitmapImage getImage(TimeSpan baseUTCTimespan)
+        {
+            try
+            {
+                switch (baseUTCTimespan.TotalHours)
+                {
+                    case -12:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m12.png"));
+                    case -11:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m11.png"));
+                    case -10:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m10.png"));
+                    case -9.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m0930.png"));
+                    case -9:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m09.png"));
+                    case -8:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m08.png"));
+                    case -7:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m07.png"));
+                    case -6:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m06.png"));
+                    case -5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m05.png"));
+                    case -4:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m04.png"));
+                    case -3.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m0330.png"));
+                    case -3:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m03.png"));
+                    case -2:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m02.png"));
+                    case -1:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/m01.png"));
+                    case 0:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p00.png"));
+                    case 1:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p01.png"));
+                    case 2:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p02.png"));
+                    case 3:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p03.png"));
+                    case 3.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0330.png"));
+                    case 4:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p04.png"));
+                    case 4.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0430.png"));
+                    case 5.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0530.png"));
+                    case 5.75:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0545.png"));
+                    case 5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p05.png"));
+                    case 6:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p06.png"));
+                    case 6.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0630.png"));
+                    case 7:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p07.png"));
+                    case 8:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p08.png"));
+                    case 8.75:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0845.png"));
+                    case 9:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p09.png"));
+                    case 9.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p0930.png"));
+                    case 10:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p10.png"));
+                    case 10.5:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p1030.png"));
+                    case 11:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p11.png"));
+                    case 12:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p12.png"));
+                    case 12.75:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p1245.png"));
+                    case 13:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p13.png"));
+                    case 14:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/p14.png"));
+                    default:
+                        return new BitmapImage(new Uri(@"pack://application:,,/Images/World_Time_Zones_Map.png"));
+
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns a new coloured Run with text
+        /// </summary>
+        /// <param name="txt">Text to include the Run</param>
+        /// <param name="brush">Colour of Text</param>
+        /// <returns>A new coloured Run with text</returns>
+        public static Run coloredRun(string txt, Brush brush, string txtToolTip = "")
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(txtToolTip))
+                    return new Run { Text = txt, Foreground = brush };
+                else
+                    return new Run { Text = txt, Foreground = brush, ToolTip = txtToolTip };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (trvElements is null) return;
+            TextBox textBox = sender as TextBox;
+            string strSearchText = textBox.Text;
+            if (string.IsNullOrEmpty(strSearchText))
+            {
+                strSearchText = "Search";
+                textBox.Text = strSearchText;
+            }
+            if (strSearchText.Trim() == "Search" )
+            {
+                itializeTreeNodes();
+            }
+            else
+            {
+                strSearchText = strSearchText.Replace("Search", string.Empty);
+                textBox.Text = strSearchText;
+                textBox.CaretIndex = strSearchText.Length;
+                CreateNodes(strSearchText);
+            }
+        }
+
+        private void CreateNodes(string searchText)
+        {
+            lstZoneInfo.Clear();
+            trvElements.Items.Clear();
+            lstZIStandarItems.Clear();
+            lstZIItems.Clear();
+            tvList.Clear();
+            ReadOnlyCollection<TimeZoneInfo> tz;
+            tz = TimeZoneInfo.GetSystemTimeZones();
+            List<TimeZoneInfo> tzones = tz.Where(t => t.DisplayName.ToLower().Contains(searchText.ToLower())).ToList();
+            string parentName = "";
+            List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
+
+            int index = 0;
+            foreach (TimeZoneInfo t in tzones)
+            {
+                parentName = t.DisplayName;
+                TreeViewItem treeNode = new TreeViewItem();
+                treeNode.Selected += treeItemSearched_Selected;
+                treeNode.Header = parentName;
+                treeNode.Items.Add(new TreeViewItem() { Header = "DisplayName                   : " + t.DisplayName });
+                treeNode.Items.Add(new TreeViewItem() { Header = "Standart Name                 : " + t.StandardName });
+                treeNode.Items.Add(new TreeViewItem() { Header = "Daylight Name                 : " + t.DaylightName });
+                treeNode.Items.Add(new TreeViewItem() { Header = "Id                            : " + t.Id });
+                treeNode.Items.Add(new TreeViewItem() { Header = "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime });
+                treeNode.Items.Add(new TreeViewItem() { Header = "Base Utc Offset               : " + t.BaseUtcOffset });
+                treeNode.TabIndex = index;
+                index++;
+                trvElements.Items.Add(treeNode);
+                lstZoneInfo.Add(new ZoneInfoElement(t.DisplayName, t));
+            }
+               
+        }
+
+        void treeItemSearched_Selected(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem item = sender as TreeViewItem;
+            //imgWorld.Source = null;
+            //imgWorld.Source = lstImages[parentItem.TabIndex];
+            currentTimeZone = lstZoneInfo[item.TabIndex].zoneInfo;
+            name = currentTimeZone.DisplayName;
+            txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
+            calledByChild = true;
+        }
+
+        private void itializeTreeNodes()
+        {
+            lstZoneInfo.Clear();
+            trvElements.Items.Clear();
+            lstZIStandarItems.Clear();
+            lstZIItems.Clear();
+            tvList.Clear();
+            ReadOnlyCollection<TimeZoneInfo> tz;
+            tz = TimeZoneInfo.GetSystemTimeZones();
+            List<TimeSpan> timeSpans;
+            timeSpans = tz.Select(t => t.BaseUtcOffset).Distinct().ToList();
+            foreach (TimeSpan ts in timeSpans)
+            {
+                List<TimeZoneInfo> tzones = tz.Where(t => t.BaseUtcOffset == ts).ToList();
+                string parentName = "";
+                List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
+                foreach (TimeZoneInfo zoneInfo in tzones)
+                {
+                    parentName = tzones[0].DisplayName.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+                    childList.Add(zoneInfo);
+                }
+                //lstImages.Add(getImage(ts));
+                tvList.Add(new tvElement(ts, parentName, childList));
+            }
+            int index = 0;
+            foreach (tvElement tv in tvList)
+            {
+                TreeViewItem treeNode = new TreeViewItem();
+                treeNode.Selected += treeItem_Selected;
+                treeNode.Header = tv.ToString();
+                treeNode.TabIndex = index;
+                index++;
+                int childIndex = 0;
+                foreach (TimeZoneInfo t in tv.childList)
+                {
+                    TreeViewItem node = new TreeViewItem();
+                    node.TabIndex = childIndex;
+                    childIndex++;
+                    string name = t.DisplayName.Split(new[] { ") " }, StringSplitOptions.RemoveEmptyEntries).Last();
+                    lstZoneInfo.Add(new ZoneInfoElement(name, t));
+                    node.Header = name;
+                    node.Selected += treeItem_Selected;
+                    node.Items.Add(new TreeViewItem() { Header = "DisplayName                   : " + t.DisplayName });
+                    node.Items.Add(new TreeViewItem() { Header = "Standart Name                 : " + t.StandardName });
+                    node.Items.Add(new TreeViewItem() { Header = "Daylight Name                 : " + t.DaylightName });
+                    node.Items.Add(new TreeViewItem() { Header = "Id                            : " + t.Id });
+                    node.Items.Add(new TreeViewItem() { Header = "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime });
+                    node.Items.Add(new TreeViewItem() { Header = "Base Utc Offset               : " + t.BaseUtcOffset });
+                    lstZIItems.Add(node);
+                    treeNode.Items.Add(node);
+                }
+                lstZIStandarItems.Add(treeNode);
+                trvElements.Items.Add(treeNode);
+            }
+            //trvElements.Items.Clear();
+        }
+
+        void treeItem_Selected(object sender, RoutedEventArgs e)
+        {
+            int childIndex = 0;
+            TreeViewItem item = sender as TreeViewItem;
+            TreeViewItem parentItem = getParent(item);
+            childIndex = getTimeZoneIndex(item);
+            if (item == parentItem)
+            {
+                if (calledByChild)
+                {
+                    calledByChild = false;
+                    return;
+                }
+                currentTimeZone = tvList[parentItem.TabIndex].childList[childIndex];
+                name = item.Header.ToString();
+                txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
+                calledByChild = false;
+                return;
+            }
+            //imgWorld.Source = null;
+            //imgWorld.Source = lstImages[parentItem.TabIndex];
+            currentTimeZone = tvList[parentItem.TabIndex].childList[childIndex];
+            name = currentTimeZone.DisplayName;
+            txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
+            calledByChild = true;
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+
+            string strSearchText = "Search";
+            if (textBox.Text.Trim() == strSearchText) textBox.Text = "";
         }
     }
 }
