@@ -26,7 +26,9 @@ namespace Global_Clock
     /// </summary>
     public partial class MainWindow : Window
     {
-        //List<BitmapImage> lstImages = new List<BitmapImage>();
+        #region "General Declaretion"
+
+        List<BitmapImage> lstImages = new List<BitmapImage>();
         BitmapImage bmpImage = new BitmapImage(new Uri("pack://application:,,/Images/World_Time_Zones_Map.png")); 
         List<tvElement> tvList = new List<tvElement>();
         List<TreeViewItem> lstZIItems = new List<TreeViewItem>();
@@ -39,24 +41,40 @@ namespace Global_Clock
         private TimeZoneInfo currentTimeZone;
         private bool calledByChild = false;
         private string name = "Eastern Standard Time";
+        private Point origin;
+        private Point start;
+        Brush treeViewItemColor = Brushes.BlanchedAlmond;
+
+        #endregion
+
+        #region "Constractors"
+
         public MainWindow()
         {
-            InitializeComponent();
-            currentTimeZone = TimeZoneInfo.FindSystemTimeZoneById(name);
-
-            itializeTreeNodes();
-            threadUpdate = new Thread(update)
+            try
             {
-                IsBackground = true
+                InitializeComponent();
+                currentTimeZone = TimeZoneInfo.FindSystemTimeZoneById(name);
 
-            };
-            threadUpdate.Start();
-            //imgWorld.Source = 
-            //imgWorld.Source = bmpImage;
-            
-            //lstZoneInfoNames = lstZoneInfo.Select(t => t.name).ToList();
-            imgWorld.Source = bmpImage;
+                itializeTreeNodes();
+                threadUpdate = new Thread(update)
+                {
+                    IsBackground = true
+
+                };
+                threadUpdate.Start();
+                //imgWorld.Source = 
+                //imgWorld.Source = bmpImage;
+
+                //lstZoneInfoNames = lstZoneInfo.Select(t => t.name).ToList();
+                imgWorld.Source = bmpImage;
+            }
+            catch (Exception) { throw; }
         }
+
+        #endregion
+
+        #region "Methods"
 
         private void update()
         {
@@ -68,61 +86,93 @@ namespace Global_Clock
                     Thread.Sleep(1000);
                 }
             }
-            catch (Exception)
-            {
-
-                throw;
-            }
+            catch (Exception){throw;}
         }
+
         private void setTxtHourText(string name)
         {
-            DateTime previewDate = TimeZoneInfo.ConvertTime(DateTime.UtcNow, currentTimeZone);
+            try
+            {
+                DateTime previewDate = TimeZoneInfo.ConvertTime(DateTime.UtcNow, currentTimeZone);
+                Brush labelColor = Brushes.Lime;
+                Brush TimeZoneColor = Brushes.SpringGreen;
+                Brush TimeColor = Brushes.BlanchedAlmond;
+                Brush DateColor = Brushes.PowderBlue;
+                txtHour.Inlines.Clear();
+                grbTimeZone.Header = name;
+                grbTimeZone.Foreground = TimeZoneColor;
+                //txtHour.Inlines.Add(coloredRun(name, TimeZoneColor));
+                //txtHour.Inlines.Add(new Run(Environment.NewLine));
+                //txtHour.Inlines.Add(coloredRun(previewDate.ToString("dddd dd MMMM yyyy  ", CultureInfo.CreateSpecificCulture("en-us")), DateColor));
+                //txtHour.Inlines.Add(new Run(Environment.NewLine));
+                //txtHour.Inlines.Add(coloredRun(previewDate.ToString("dd"), DateColor));
+                //txtHour.Inlines.Add(coloredRun("/", labelColor));
+                //txtHour.Inlines.Add(coloredRun(previewDate.ToString("MM"), DateColor));
+                //txtHour.Inlines.Add(coloredRun("/", labelColor));
+                //txtHour.Inlines.Add(coloredRun(previewDate.ToString("yyyy"), DateColor));
+                //txtHour.Inlines.Add(new Run(Environment.NewLine));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("HH"), TimeColor));
+                txtHour.Inlines.Add(coloredRun(":", labelColor));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("mm"), TimeColor));
+                txtHour.Inlines.Add(coloredRun(":", labelColor));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("ss"), TimeColor));
+                txtHour.Inlines.Add(new Run(Environment.NewLine));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("dd"), DateColor));
+                txtHour.Inlines.Add(coloredRun("/", labelColor));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("MM"), DateColor));
+                txtHour.Inlines.Add(coloredRun("/", labelColor));
+                txtHour.Inlines.Add(coloredRun(previewDate.ToString("yyyy"), DateColor));
 
-            txtHour.Inlines.Clear();
-            txtHour.Inlines.Add(coloredRun(name, Brushes.DarkSlateBlue));
-            txtHour.Inlines.Add(new Run(Environment.NewLine));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("dddd MMMM", CultureInfo.CreateSpecificCulture("en-us")), Brushes.OrangeRed));
-            txtHour.Inlines.Add(new Run(Environment.NewLine));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("dd"), Brushes.DarkSlateGray));
-            txtHour.Inlines.Add(coloredRun("/", Brushes.OrangeRed));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("MM"), Brushes.DarkSlateGray));
-            txtHour.Inlines.Add(coloredRun("/", Brushes.OrangeRed));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("yyyy"), Brushes.DarkSlateGray));
-            txtHour.Inlines.Add(new Run(Environment.NewLine));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("HH"), Brushes.DarkSlateGray));
-            txtHour.Inlines.Add(coloredRun(":", Brushes.OrangeRed));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("mm"), Brushes.DarkSlateGray));
-            txtHour.Inlines.Add(coloredRun(":", Brushes.OrangeRed));
-            txtHour.Inlines.Add(coloredRun(previewDate.ToString("ss"), Brushes.DarkSlateGray));
-            //txtHour.Inlines.Add(coloredRun(previewDate.ToString("HH:mm:ss"), Brushes.OrangeRed));
-            //txtHour.Text = currentTimeZone.DisplayName;
-            //txtHour.Text = previewDate.ToString("dddd MMMM", CultureInfo.CreateSpecificCulture("en-us")) + "  " + previewDate.ToString("dd/MM/yyyy") + Environment.NewLine;
-            //txtHour.Text += previewDate.ToString("HH:mm:ss");
+                previewDate = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.Local);
+                txtLocalHour.Inlines.Clear();
+                //txtLocalHour.Inlines.Add(coloredRun("Local Time : " + TimeZoneInfo.Local.DisplayName, TimeZoneColor));
+                //txtLocalHour.Inlines.Add(new Run(Environment.NewLine));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("HH"), TimeColor));
+                txtLocalHour.Inlines.Add(coloredRun(":", labelColor));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("mm"), TimeColor));
+                txtLocalHour.Inlines.Add(coloredRun(":", labelColor));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("ss"), TimeColor));
+                txtLocalHour.Inlines.Add(new Run(Environment.NewLine));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("dd"), DateColor));
+                txtLocalHour.Inlines.Add(coloredRun("/", labelColor));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("MM"), DateColor));
+                txtLocalHour.Inlines.Add(coloredRun("/", labelColor));
+                txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("yyyy"), DateColor));
+                //txtLocalHour.Inlines.Add(coloredRun(previewDate.ToString("dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-us")), DateColor));
+            }
+            catch (Exception) { throw; }
         }
         
-
         private int getTimeZoneIndex(TreeViewItem item)
         {
-            int index = 0;
-            if (lstZoneInfo.Select(t => t.name).ToList().Contains(item.Header))
+            try
             {
-                index = item.TabIndex;
+                int index = 0;
+                if (lstZoneInfo.Select(t => t.name).ToList().Contains(item.Header))
+                {
+                    index = item.TabIndex;
+                }
+                return index;
             }
-            return index;
+            catch (Exception) { throw; }
         }
 
         private TreeViewItem getParent(TreeViewItem item)
         {
-            TreeViewItem Parent;
-            if (item.Parent is TreeViewItem)
+            try
             {
-               Parent = getParent(item.Parent as TreeViewItem);
+                TreeViewItem Parent;
+                if (item.Parent is TreeViewItem)
+                {
+                    Parent = getParent(item.Parent as TreeViewItem);
+                }
+                else
+                {
+                    return item;
+                }
+                return Parent;
             }
-            else
-            {
-                return item;
-            }
-            return Parent;
+            catch (Exception) { throw; }
         }
 
         private BitmapImage getImage(TimeSpan baseUTCTimespan)
@@ -241,163 +291,274 @@ namespace Global_Clock
             }
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (trvElements is null) return;
-            TextBox textBox = sender as TextBox;
-            string strSearchText = textBox.Text;
-            if (string.IsNullOrEmpty(strSearchText))
-            {
-                strSearchText = "Search";
-                textBox.Text = strSearchText;
-            }
-            if (strSearchText.Trim() == "Search" )
-            {
-                itializeTreeNodes();
-            }
-            else
-            {
-                strSearchText = strSearchText.Replace("Search", string.Empty);
-                textBox.Text = strSearchText;
-                textBox.CaretIndex = strSearchText.Length;
-                CreateNodes(strSearchText);
-            }
-        }
-
         private void CreateNodes(string searchText)
         {
-            lstZoneInfo.Clear();
-            trvElements.Items.Clear();
-            lstZIStandarItems.Clear();
-            lstZIItems.Clear();
-            tvList.Clear();
-            ReadOnlyCollection<TimeZoneInfo> tz;
-            tz = TimeZoneInfo.GetSystemTimeZones();
-            List<TimeZoneInfo> tzones = tz.Where(t => t.DisplayName.ToLower().Contains(searchText.ToLower())).ToList();
-            string parentName = "";
-            List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
-
-            int index = 0;
-            foreach (TimeZoneInfo t in tzones)
+            try
             {
-                parentName = t.DisplayName;
-                TreeViewItem treeNode = new TreeViewItem();
-                treeNode.Selected += treeItemSearched_Selected;
-                treeNode.Header = parentName;
-                treeNode.Items.Add(new TreeViewItem() { Header = "DisplayName                   : " + t.DisplayName });
-                treeNode.Items.Add(new TreeViewItem() { Header = "Standart Name                 : " + t.StandardName });
-                treeNode.Items.Add(new TreeViewItem() { Header = "Daylight Name                 : " + t.DaylightName });
-                treeNode.Items.Add(new TreeViewItem() { Header = "Id                            : " + t.Id });
-                treeNode.Items.Add(new TreeViewItem() { Header = "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime });
-                treeNode.Items.Add(new TreeViewItem() { Header = "Base Utc Offset               : " + t.BaseUtcOffset });
-                treeNode.TabIndex = index;
-                index++;
-                trvElements.Items.Add(treeNode);
-                lstZoneInfo.Add(new ZoneInfoElement(t.DisplayName, t));
-            }
-               
-        }
+                lstZoneInfo.Clear();
+                trvElements.Items.Clear();
+                lstZIStandarItems.Clear();
+                lstZIItems.Clear();
+                tvList.Clear();
+                ReadOnlyCollection<TimeZoneInfo> tz;
+                tz = TimeZoneInfo.GetSystemTimeZones();
+                List<TimeZoneInfo> tzones = tz.Where(t => t.DisplayName.ToLower().Contains(searchText.ToLower())).ToList();
+                string parentName = "";
+                List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
 
-        void treeItemSearched_Selected(object sender, RoutedEventArgs e)
-        {
-            TreeViewItem item = sender as TreeViewItem;
-            //imgWorld.Source = null;
-            //imgWorld.Source = lstImages[parentItem.TabIndex];
-            currentTimeZone = lstZoneInfo[item.TabIndex].zoneInfo;
-            name = currentTimeZone.DisplayName;
-            txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
-            calledByChild = true;
+                int index = 0;
+                foreach (TimeZoneInfo t in tzones)
+                {
+                    parentName = t.DisplayName;
+                    TreeViewItem treeNode = new TreeViewItem() { Foreground = treeViewItemColor };
+                    treeNode.Selected += treeItemSearched_Selected;
+                    treeNode.KeyDown += TreeViewItem_KeyDown;
+                    treeNode.Header = parentName;
+                    treeNode.Items.Add(new TreeViewItem()
+                    {
+                        Foreground = treeViewItemColor,
+                        Header = "DisplayName                   : " + t.DisplayName + Environment.NewLine +
+                                 "Standart Name                 : " + t.StandardName + Environment.NewLine +
+                                 "Daylight Name                 : " + t.DaylightName + Environment.NewLine +
+                                 "Id                            : " + t.Id + Environment.NewLine +
+                                 "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime + Environment.NewLine +
+                                 "Base Utc Offset               : " + t.BaseUtcOffset
+                    });
+                    treeNode.TabIndex = index;
+                    index++;
+                    trvElements.Items.Add(treeNode);
+                    lstZoneInfo.Add(new ZoneInfoElement(t.DisplayName, t));
+                }
+            }
+            catch (Exception) { throw; }
+               
         }
 
         private void itializeTreeNodes()
         {
-            lstZoneInfo.Clear();
-            trvElements.Items.Clear();
-            lstZIStandarItems.Clear();
-            lstZIItems.Clear();
-            tvList.Clear();
-            ReadOnlyCollection<TimeZoneInfo> tz;
-            tz = TimeZoneInfo.GetSystemTimeZones();
-            List<TimeSpan> timeSpans;
-            timeSpans = tz.Select(t => t.BaseUtcOffset).Distinct().ToList();
-            foreach (TimeSpan ts in timeSpans)
+            try
             {
-                List<TimeZoneInfo> tzones = tz.Where(t => t.BaseUtcOffset == ts).ToList();
-                string parentName = "";
-                List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
-                foreach (TimeZoneInfo zoneInfo in tzones)
+                lstZoneInfo.Clear();
+                trvElements.Items.Clear();
+                lstZIStandarItems.Clear();
+                lstZIItems.Clear();
+                tvList.Clear();
+                ReadOnlyCollection<TimeZoneInfo> tz;
+                tz = TimeZoneInfo.GetSystemTimeZones();
+                List<TimeSpan> timeSpans;
+                timeSpans = tz.Select(t => t.BaseUtcOffset).Distinct().ToList();
+                foreach (TimeSpan ts in timeSpans)
                 {
-                    parentName = tzones[0].DisplayName.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
-                    childList.Add(zoneInfo);
+                    List<TimeZoneInfo> tzones = tz.Where(t => t.BaseUtcOffset == ts).ToList();
+                    string parentName = "";
+                    List<TimeZoneInfo> childList = new List<TimeZoneInfo>();
+                    foreach (TimeZoneInfo zoneInfo in tzones)
+                    {
+                        parentName = tzones[0].DisplayName.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+                        childList.Add(zoneInfo);
+                    }
+                    lstImages.Add(getImage(ts));
+                    tvList.Add(new tvElement(ts, parentName, childList));
                 }
-                //lstImages.Add(getImage(ts));
-                tvList.Add(new tvElement(ts, parentName, childList));
-            }
-            int index = 0;
-            foreach (tvElement tv in tvList)
-            {
-                TreeViewItem treeNode = new TreeViewItem();
-                treeNode.Selected += treeItem_Selected;
-                treeNode.Header = tv.ToString();
-                treeNode.TabIndex = index;
-                index++;
-                int childIndex = 0;
-                foreach (TimeZoneInfo t in tv.childList)
+                int index = 0;
+                foreach (tvElement tv in tvList)
                 {
-                    TreeViewItem node = new TreeViewItem();
-                    node.TabIndex = childIndex;
-                    childIndex++;
-                    string name = t.DisplayName.Split(new[] { ") " }, StringSplitOptions.RemoveEmptyEntries).Last();
-                    lstZoneInfo.Add(new ZoneInfoElement(name, t));
-                    node.Header = name;
-                    node.Selected += treeItem_Selected;
-                    node.Items.Add(new TreeViewItem() { Header = "DisplayName                   : " + t.DisplayName });
-                    node.Items.Add(new TreeViewItem() { Header = "Standart Name                 : " + t.StandardName });
-                    node.Items.Add(new TreeViewItem() { Header = "Daylight Name                 : " + t.DaylightName });
-                    node.Items.Add(new TreeViewItem() { Header = "Id                            : " + t.Id });
-                    node.Items.Add(new TreeViewItem() { Header = "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime });
-                    node.Items.Add(new TreeViewItem() { Header = "Base Utc Offset               : " + t.BaseUtcOffset });
-                    lstZIItems.Add(node);
-                    treeNode.Items.Add(node);
+                    TreeViewItem treeNode = new TreeViewItem() { Foreground = treeViewItemColor };
+                    treeNode.Selected += treeItem_Selected;
+                    treeNode.Header = tv.ToString();
+                    treeNode.TabIndex = index;
+                    treeNode.KeyDown += TreeViewItem_KeyDown;
+                    index++;
+                    int childIndex = 0;
+                    foreach (TimeZoneInfo t in tv.childList)
+                    {
+                        TreeViewItem node = new TreeViewItem() { Foreground = treeViewItemColor }; ;
+                        node.TabIndex = childIndex;
+                        node.KeyDown += TreeViewItem_KeyDown;
+                        childIndex++;
+                        string name = t.DisplayName.Split(new[] { ") " }, StringSplitOptions.RemoveEmptyEntries).Last();
+                        lstZoneInfo.Add(new ZoneInfoElement(name, t));
+                        node.Header = name;
+                        node.Selected += treeItem_Selected;
+                        node.Items.Add(new TreeViewItem()
+                        {
+                            Foreground = treeViewItemColor,
+                            Header = "DisplayName       : " + t.DisplayName + Environment.NewLine +
+                                     "Standart Name     : " + t.StandardName + Environment.NewLine +
+                                     "Daylight Name     : " + t.DaylightName + Environment.NewLine +
+                                     "Id                : " + t.Id + Environment.NewLine +
+                                     "Supports Daylight" + Environment.NewLine + 
+                                     "Saving Time       : " + t.SupportsDaylightSavingTime + Environment.NewLine +
+                                     "Base Utc Offset   : " + t.BaseUtcOffset
+                        });
+                        lstZIItems.Add(node);
+                        treeNode.Items.Add(node);
+                    }
+                    lstZIStandarItems.Add(treeNode);
+                    trvElements.Items.Add(treeNode);
                 }
-                lstZIStandarItems.Add(treeNode);
-                trvElements.Items.Add(treeNode);
+                //trvElements.Items.Clear();
             }
-            //trvElements.Items.Clear();
+            catch (Exception){throw;}
         }
 
-        void treeItem_Selected(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region "Event Handlers"
+        
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            int childIndex = 0;
-            TreeViewItem item = sender as TreeViewItem;
-            TreeViewItem parentItem = getParent(item);
-            childIndex = getTimeZoneIndex(item);
-            if (item == parentItem)
+            try
             {
-                if (calledByChild)
+                if (trvElements is null) return;
+                TextBox textBox = sender as TextBox;
+                string strSearchText = textBox.Text;
+                if (string.IsNullOrEmpty(strSearchText))
                 {
+                    strSearchText = "Search";
+                    textBox.Text = strSearchText;
+                }
+                if (strSearchText.Trim() == "Search")
+                {
+                    itializeTreeNodes();
+                }
+                else
+                {
+                    strSearchText = strSearchText.Replace("Search", string.Empty);
+                    textBox.Text = strSearchText;
+                    textBox.CaretIndex = strSearchText.Length;
+                    CreateNodes(strSearchText);
+                }
+            }
+            catch (Exception) { throw; }
+        }
+
+        private void treeItemSearched_Selected(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TreeViewItem item = sender as TreeViewItem;
+
+                currentTimeZone = lstZoneInfo[item.TabIndex].zoneInfo;
+                imgWorld.Source = null;
+                imgWorld.Source = getImage(currentTimeZone.BaseUtcOffset);
+                name = currentTimeZone.DisplayName;
+                txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
+                calledByChild = false;
+            }
+            catch (Exception) { throw; }
+        }
+
+        private void treeItem_Selected(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int childIndex = 0;
+                TreeViewItem item = sender as TreeViewItem;
+                TreeViewItem parentItem = getParent(item);
+                childIndex = getTimeZoneIndex(item);
+                if (item == parentItem)
+                {
+                    if (calledByChild)
+                    {
+                        calledByChild = false;
+                        return;
+                    }
+                    imgWorld.Source = null;
+                    imgWorld.Source = lstImages[parentItem.TabIndex];
+                    currentTimeZone = tvList[parentItem.TabIndex].childList[childIndex];
+                    name = item.Header.ToString();
+                    txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
                     calledByChild = false;
                     return;
                 }
+                imgWorld.Source = null;
+                imgWorld.Source = lstImages[parentItem.TabIndex];
                 currentTimeZone = tvList[parentItem.TabIndex].childList[childIndex];
-                name = item.Header.ToString();
+                name = currentTimeZone.DisplayName;
                 txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
-                calledByChild = false;
-                return;
+                calledByChild = true;
             }
-            //imgWorld.Source = null;
-            //imgWorld.Source = lstImages[parentItem.TabIndex];
-            currentTimeZone = tvList[parentItem.TabIndex].childList[childIndex];
-            name = currentTimeZone.DisplayName;
-            txtHour.Dispatcher.Invoke(new UpdateTime(setTxtHourText), name);
-            calledByChild = true;
+            catch (Exception) { throw; }
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-
-            string strSearchText = "Search";
-            if (textBox.Text.Trim() == strSearchText) textBox.Text = "";
+            try
+            {
+                string strSearchText = "Search";
+                if (textBox.Text.Trim() == strSearchText) textBox.Text = "";
+            }
+            catch (Exception) { throw; }
         }
+
+        private void image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (imgWorld.IsMouseCaptured) return;
+                imgWorld.CaptureMouse();
+
+                start = e.GetPosition(border);
+                origin.X = imgWorld.RenderTransform.Value.OffsetX;
+                origin.Y = imgWorld.RenderTransform.Value.OffsetY;
+            }
+            catch (Exception) { throw; }
+        }
+
+        private void image_MouseMove(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (!imgWorld.IsMouseCaptured) return;
+                Point p = e.MouseDevice.GetPosition(border);
+
+                Matrix m = imgWorld.RenderTransform.Value;
+                m.OffsetX = origin.X + (p.X - start.X);
+                m.OffsetY = origin.Y + (p.Y - start.Y);
+
+                imgWorld.RenderTransform = new MatrixTransform(m);
+            }
+            catch (Exception){throw;}
+        }
+
+        private void image_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            try
+            {
+                Point p = e.MouseDevice.GetPosition(imgWorld);
+
+                Matrix m = imgWorld.RenderTransform.Value;
+                if (e.Delta > 0)
+                    m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
+                else
+                    m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
+
+                imgWorld.RenderTransform = new MatrixTransform(m);
+            }
+            catch (Exception){throw;}
+        }
+
+        private void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            try{imgWorld.ReleaseMouseCapture();}
+            catch (Exception){throw;}
+        }
+
+        private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                TreeViewItem item = sender as TreeViewItem;
+                if(e.Key == Key.Enter || e.Key == Key.Space)
+                {
+                    item.IsExpanded = !item.IsExpanded;
+                }
+            }
+            catch (Exception){throw;}
+        }
+
+        #endregion
+
     }
 }
