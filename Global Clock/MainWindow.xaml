@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="10*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -18,26 +19,53 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition  Width="10*"/>
         </Grid.ColumnDefinitions>
-
-        <GroupBox  x:Name="grbTimeZone" Grid.Row="0"  HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="14" Margin="0,10">
+        <Grid  Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10*" />
+                    <ColumnDefinition  Width="10*"/>
+                </Grid.ColumnDefinitions>
+            <GroupBox x:Name="grbTimeConvertTZ" Header="Time Zone" Foreground="GreenYellow" Margin="5"  >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <DatePicker x:Name="dpTimeZone" Grid.Column="0"  Margin="5" Width="85"/>
+                    <local:TimeControl x:Name="TCTimeZone" Grid.Column="1" Grid.Row="1" Margin="5" />
+                        <!--<local:TimeControl x:Name="TimeControl" Hours="10" Minutes="10" Seconds="10"/>-->
+                    </Grid>
+                </GroupBox>
+            <GroupBox x:Name="grbTimeConvertLocal" Header="Local" Foreground="GreenYellow"  Grid.Column="1" Margin="5" IsEnabled="False" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <DatePicker x:Name="dpLocal" Grid.Column="0"  Margin="5" Width="85"/>
+                    <local:TimeControl x:Name="TCLocal" Grid.Column="1" Grid.Row="1" Margin="5"/>
+                        <!--<local:TimeControl x:Name="TimeControl" Hours="10" Minutes="10" Seconds="10"/>-->
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        <GroupBox  x:Name="grbTimeZone"  HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="14" Margin="5,10,0,0" >
             <TextBlock x:Name="txtHour" FontFamily="Consolas" FontSize="14"  TextAlignment="Center"  >
                 <TextBlock.Background>
                     <SolidColorBrush Color="#FF002147" Opacity="0.4"/>
                 </TextBlock.Background>
             </TextBlock>
         </GroupBox>
-        <TextBox x:Name="textBox" Grid.Row="1" TextWrapping="Wrap" Text="Search" FontFamily="Consolas" FontSize="14" VerticalContentAlignment="Stretch"  TextChanged="TextBox_TextChanged" GotFocus="TextBox_GotFocus" Margin="5,5,0,5" HorizontalContentAlignment="Stretch"/>
+        <TextBox x:Name="textBox" Grid.Row="2" TextWrapping="Wrap" Text="Search" FontFamily="Consolas" FontSize="14" VerticalContentAlignment="Stretch"  TextChanged="TextBox_TextChanged" GotFocus="TextBox_GotFocus" Margin="5,5,0,5" HorizontalContentAlignment="Stretch"/>
 
-        <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left"  Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}" Grid.Column="1"  Width="5" Margin="5,0,0,0" Grid.RowSpan="4"/>
-        <TreeView x:Name="trvElements" Grid.Column="0" FontFamily="Consolas"  Grid.RowSpan="2" Foreground="Cyan" Grid.Row="2" MinWidth="200" Margin="5,0,0,5">
+        <GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left"  Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}" Grid.Column="1"  Width="5" Margin="5,0,0,0" Grid.RowSpan="5"/>
+        <TreeView x:Name="trvElements" Grid.Column="0" FontFamily="Consolas"  Grid.RowSpan="2" Foreground="Cyan" Grid.Row="3" MinWidth="200" Margin="5,0,0,5">
             <TreeView.Background>
                 <SolidColorBrush Color="#FF000F38" Opacity="0.4"/>
             </TreeView.Background>
         </TreeView>
-        <Border Name="border" ClipToBounds="True"  Grid.Column="1" Margin="15,5,5,5" BorderBrush="Black" Grid.RowSpan="4">
+        <Border Name="border" ClipToBounds="True"  Grid.Column="1" Margin="15,5,5,5" BorderBrush="Black" Grid.RowSpan="5">
             <Image x:Name="imgWorld"  Source="Images/p10.png"  MouseLeftButtonDown="image_MouseLeftButtonDown" MouseMove="image_MouseMove" MouseWheel="image_MouseWheel" MouseLeftButtonUp="image_MouseLeftButtonUp" Margin="10,0,0,0" OpacityMask="Black" />
         </Border>
-        <Grid Grid.Row="3" Grid.Column="1" Margin="0,10,10,10" HorizontalAlignment="Right" VerticalAlignment="Top">
+        <Grid Grid.Row="4" Grid.Column="1" Margin="0,10,10,10" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Rectangle RadiusX="5" RadiusY="5" Stroke="Black">
                 <Rectangle.Fill>
                     <SolidColorBrush Color="#FF000F38" Opacity="0.7"/>

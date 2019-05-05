@@ -68,6 +68,12 @@ namespace Global_Clock
 
                 //lstZoneInfoNames = lstZoneInfo.Select(t => t.name).ToList();
                 imgWorld.Source = bmpImage;
+                TCTimeZone.ValueChanged += TCTimeZone_ValueChanged;
+                dpLocal.DisplayDate = DateTime.Now;
+                dpTimeZone.SelectedDate = DateTime.Now;
+                dpTimeZone.DisplayDate = DateTime.Now;
+                dpLocal.SelectedDate = DateTime.Now;
+
             }
             catch (Exception) { throw; }
         }
@@ -94,6 +100,7 @@ namespace Global_Clock
             try
             {
                 DateTime previewDate = TimeZoneInfo.ConvertTime(DateTime.UtcNow, currentTimeZone);
+                setLocalTime();
                 Brush labelColor = Brushes.Lime;
                 Brush TimeZoneColor = Brushes.SpringGreen;
                 Brush TimeColor = Brushes.BlanchedAlmond;
@@ -314,16 +321,13 @@ namespace Global_Clock
                     treeNode.Selected += treeItemSearched_Selected;
                     treeNode.KeyDown += TreeViewItem_KeyDown;
                     treeNode.Header = parentName;
-                    treeNode.Items.Add(new TreeViewItem()
-                    {
-                        Foreground = treeViewItemColor,
-                        Header = "DisplayName                   : " + t.DisplayName + Environment.NewLine +
-                                 "Standart Name                 : " + t.StandardName + Environment.NewLine +
-                                 "Daylight Name                 : " + t.DaylightName + Environment.NewLine +
-                                 "Id                            : " + t.Id + Environment.NewLine +
-                                 "Supports Daylight Saving Time : " + t.SupportsDaylightSavingTime + Environment.NewLine +
-                                 "Base Utc Offset               : " + t.BaseUtcOffset
-                    });
+                    treeNode.ToolTip = "DisplayName       : " + t.DisplayName + Environment.NewLine +
+                                     "Standart Name     : " + t.StandardName + Environment.NewLine +
+                                     "Daylight Name     : " + t.DaylightName + Environment.NewLine +
+                                     "Id                : " + t.Id + Environment.NewLine +
+                                     "Supports Daylight" + Environment.NewLine +
+                                     "Saving Time       : " + t.SupportsDaylightSavingTime + Environment.NewLine +
+                                     "Base Utc Offset   : " + t.BaseUtcOffset;
                     treeNode.TabIndex = index;
                     index++;
                     trvElements.Items.Add(treeNode);
@@ -380,17 +384,13 @@ namespace Global_Clock
                         lstZoneInfo.Add(new ZoneInfoElement(name, t));
                         node.Header = name;
                         node.Selected += treeItem_Selected;
-                        node.Items.Add(new TreeViewItem()
-                        {
-                            Foreground = treeViewItemColor,
-                            Header = "DisplayName       : " + t.DisplayName + Environment.NewLine +
+                        node.ToolTip = "DisplayName       : " + t.DisplayName + Environment.NewLine +
                                      "Standart Name     : " + t.StandardName + Environment.NewLine +
                                      "Daylight Name     : " + t.DaylightName + Environment.NewLine +
                                      "Id                : " + t.Id + Environment.NewLine +
-                                     "Supports Daylight" + Environment.NewLine + 
+                                     "Supports Daylight" + Environment.NewLine +
                                      "Saving Time       : " + t.SupportsDaylightSavingTime + Environment.NewLine +
-                                     "Base Utc Offset   : " + t.BaseUtcOffset
-                        });
+                                     "Base Utc Offset   : " + t.BaseUtcOffset;
                         lstZIItems.Add(node);
                         treeNode.Items.Add(node);
                     }
@@ -402,6 +402,20 @@ namespace Global_Clock
             catch (Exception){throw;}
         }
 
+        private void setLocalTime()
+        {
+            try
+            {
+                DateTime dp = (DateTime)dpTimeZone.SelectedDate;
+                DateTime SelectedTime = TimeZoneInfo.ConvertTimeToUtc(new DateTime(dp.Year, dp.Month, dp.Day, TCTimeZone.Hours, TCTimeZone.Minutes, TCTimeZone.Seconds), currentTimeZone);
+                DateTime PreviewDate = TimeZoneInfo.ConvertTime(SelectedTime, TimeZoneInfo.Local);
+                dpLocal.SelectedDate = PreviewDate;
+                TCLocal.Hours = PreviewDate.Hour;
+                TCLocal.Minutes = PreviewDate.Minute;
+                TCLocal.Seconds = PreviewDate.Second;
+            }
+            catch (Exception){throw;}
+        }
         #endregion
 
         #region "Event Handlers"
@@ -556,6 +570,18 @@ namespace Global_Clock
                 }
             }
             catch (Exception){throw;}
+        }
+
+        private void TCTimeZone_ValueChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            try
+            {
+                setLocalTime();
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         #endregion
